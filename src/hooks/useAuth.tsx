@@ -1,27 +1,67 @@
-import { useEffect, useState } from "react";
-import type { Session, User } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import {
+  clearToken,
+  getCurrentUser,
+  getToken,
+  loginAccount,
+  registerAccount,
+  setToken,
+  type PublicUser,
+} from "@/lib/api";
 
-export function useAuth() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
+type AuthValue = {
+  user: PublicUser | null;
+  loading: boolean;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (name: string, email: string, password: string) => Promise<void>;
+  signOut: () => void;
+  updateUser: (user: PublicUser) => void;
+};
+
+const AuthContext = createContext<AuthValue | null>(null);
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<PublicUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      setSession(nextSession);
-      setUser(nextSession?.user ?? null);
+    const token = getToken();
+    if (!token) {
       setLoading(false);
-    });
-
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => sub.subscription.unsubscribe();
+      return;
+    }
+    getCurrentUser()
+      .then(({ user: current }) => setUser(current))
+      .catch(() => clearToken())
+      .finally(() => setLoading(false));
   }, []);
 
-  return { session, user, loading };
+  const signIn = useCallback(async (email: string, password: string) => {
+    const { token, user: signedInUser } = await loginAccount(email, password);
+    setToken(token);
+    setUser(signedInUser);
+  }, []);
+
+  const signUp = useCallback(async (name: string, email: string, password: string) => {
+    const { token, user: newUser } = await registerAccount(name, email, password);
+    setToken(token);
+    setUser(newUser);
+  }, []);
+
+  const signOut = useCallback(() => {
+    clearToken();
+    setUser(null);
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, updateUser: setUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used within an AuthProvider");
+  return ctx;
 }

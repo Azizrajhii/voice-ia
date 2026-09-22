@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import { Mic, Square, Sparkles, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { askSouty } from "@/lib/souty.functions";
+import { askSouty } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -22,7 +21,6 @@ type Turn = { role: "user" | "assistant"; content: string };
 type SpeechRecognitionLike = any;
 
 export function VoiceWorkspace() {
-  const ask = useServerFn(askSouty);
   const [lang, setLang] = useState<Lang>("derja");
   const [status, setStatus] = useState<Status>("ready");
   const [transcript, setTranscript] = useState("");
@@ -44,7 +42,7 @@ export function VoiceWorkspace() {
       setTurns((prev) => [...prev, { role: "user", content: clean }]);
       try {
         const history = turns.slice(-6);
-        const result = await ask({ data: { transcript: clean, language: lang, history } });
+        const result = await askSouty(clean, lang, history);
         setTurns((prev) => [...prev, { role: "assistant", content: result.reply }]);
         if ("speechSynthesis" in window) {
           const utter = new SpeechSynthesisUtterance(result.reply);
@@ -58,7 +56,7 @@ export function VoiceWorkspace() {
         setTranscript("");
       }
     },
-    [ask, lang, turns],
+    [lang, turns],
   );
 
   function stopListening() {

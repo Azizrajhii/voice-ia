@@ -3,8 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Loader2, Mic } from "lucide-react";
 
-import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,6 +31,7 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { user, signIn, signUp } = useAuth();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,54 +39,26 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/dashboard" });
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (session) navigate({ to: "/dashboard" });
-    });
-    return () => sub.subscription.unsubscribe();
-  }, [navigate]);
+    if (user) navigate({ to: "/dashboard" });
+  }, [user, navigate]);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setBusy(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
-            data: { display_name: name },
-          },
-        });
-        if (error) throw error;
-        toast.success("Account created. Check your inbox to confirm your email.");
+        await signUp(name, email, password);
+        toast.success("Account created. Welcome to Souty.");
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        await signIn(email, password);
         toast.success("Welcome back to Souty.");
       }
+      navigate({ to: "/dashboard" });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong.");
     } finally {
       setBusy(false);
     }
-  }
-
-  async function handleGoogle() {
-    setBusy(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      setBusy(false);
-      toast.error("Google sign-in failed. Please try again.");
-      return;
-    }
-    if (result.redirected) return;
-    navigate({ to: "/dashboard" });
   }
 
   return (
@@ -119,6 +91,12 @@ function AuthPage() {
 
       <section className="flex items-center justify-center px-6 py-14">
         <div className="w-full max-w-sm animate-rise">
+          <Link to="/" className="mb-8 flex items-center gap-3 lg:hidden">
+            <span className="surface-warm flex size-9 items-center justify-center rounded-xl">
+              <Mic className="size-4 text-coral-foreground" />
+            </span>
+            <span className="font-display text-lg font-semibold">Souty</span>
+          </Link>
           <h2 className="font-display text-3xl font-semibold">
             {mode === "signin" ? "Welcome back" : "Create your account"}
           </h2>
@@ -171,23 +149,6 @@ function AuthPage() {
               {mode === "signin" ? "Sign in" : "Create account"}
             </Button>
           </form>
-
-          <div className="my-6 flex items-center gap-4 text-xs text-muted-foreground">
-            <span className="h-px flex-1 bg-border" />
-            OR
-            <span className="h-px flex-1 bg-border" />
-          </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            size="lg"
-            className="w-full rounded-xl"
-            onClick={handleGoogle}
-            disabled={busy}
-          >
-            Continue with Google
-          </Button>
 
           <p className="mt-8 text-center text-sm text-muted-foreground">
             {mode === "signin" ? "New to Souty?" : "Already have an account?"}{" "}
