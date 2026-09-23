@@ -1,12 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  askSouty,
-  clearToken,
-  getCurrentUser,
-  getToken,
-  loginAccount,
-  setToken,
-} from "./api";
+import { askSouty, clearToken, getCurrentUser, getToken, loginAccount, setToken } from "./api";
 
 function mockFetchOnce(status: number, body: unknown) {
   return vi.fn().mockResolvedValue({

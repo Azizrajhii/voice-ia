@@ -1,8 +1,8 @@
-import { createMessage } from '../models/Message.js';
-import { retryFetch } from '../lib/retryFetch.js';
-import { validateChatBody, toGeminiContents, extractReplyText } from '../lib/chat.js';
+import { createMessage } from "../models/Message.js";
+import { retryFetch } from "../lib/retryFetch.js";
+import { validateChatBody, toGeminiContents, extractReplyText } from "../lib/chat.js";
 
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.6-flash";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 const SYSTEM_PROMPT = `You are Souty, a warm, sharp Tunisian AI voice assistant.
@@ -19,7 +19,7 @@ export async function postChat(req, res) {
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      return res.status(500).json({ message: 'AI is not configured yet.' });
+      return res.status(500).json({ message: "AI is not configured yet." });
     }
 
     // Gemini's free tier occasionally returns 503 ("model overloaded") under
@@ -29,8 +29,8 @@ export async function postChat(req, res) {
     const response = await retryFetch(
       () =>
         fetch(GEMINI_URL, {
-          method: 'POST',
-          headers: { 'x-goog-api-key': apiKey, 'content-type': 'application/json' },
+          method: "POST",
+          headers: { "x-goog-api-key": apiKey, "content-type": "application/json" },
           body: JSON.stringify({
             system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
             contents: toGeminiContents(history, transcript),
@@ -40,30 +40,30 @@ export async function postChat(req, res) {
     );
 
     if (response.status === 429) {
-      return res.status(429).json({ message: 'Souty is busy right now. Try again in a moment.' });
+      return res.status(429).json({ message: "Souty is busy right now. Try again in a moment." });
     }
     if (response.status === 503) {
       return res
         .status(503)
-        .json({ message: 'Souty is overloaded right now. Please try again in a few seconds.' });
+        .json({ message: "Souty is overloaded right now. Please try again in a few seconds." });
     }
     if (!response.ok) {
       const errorBody = await response.text();
-      console.error('Gemini API error:', response.status, errorBody);
-      return res.status(502).json({ message: 'Souty could not answer that. Please try again.' });
+      console.error("Gemini API error:", response.status, errorBody);
+      return res.status(502).json({ message: "Souty could not answer that. Please try again." });
     }
 
     const payload = await response.json();
     const reply = extractReplyText(payload);
     if (!reply) {
-      return res.status(502).json({ message: 'Souty returned an empty answer.' });
+      return res.status(502).json({ message: "Souty returned an empty answer." });
     }
 
     await createMessage({ userId: req.userId, transcript, reply, language });
 
     return res.json({ reply });
   } catch (error) {
-    console.error('Error in chat handler:', error);
-    return res.status(500).json({ message: 'Souty could not answer that. Please try again.' });
+    console.error("Error in chat handler:", error);
+    return res.status(500).json({ message: "Souty could not answer that. Please try again." });
   }
 }

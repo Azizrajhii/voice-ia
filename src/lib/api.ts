@@ -63,7 +63,11 @@ export async function getCurrentUser() {
 }
 
 export async function updateDisplayName(name: string) {
-  return request<{ user: PublicUser }>("/users/me", { method: "PATCH", body: { name }, auth: true });
+  return request<{ user: PublicUser }>("/users/me", {
+    method: "PATCH",
+    body: { name },
+    auth: true,
+  });
 }
 
 export async function getMessageStats() {
@@ -90,10 +94,9 @@ export type ConversationMessage = {
 };
 
 export async function getMessages(limit = 20, offset = 0) {
-  return request<{ messages: ConversationMessage[] }>(
-    `/messages?limit=${limit}&offset=${offset}`,
-    { auth: true },
-  );
+  return request<{ messages: ConversationMessage[] }>(`/messages?limit=${limit}&offset=${offset}`, {
+    auth: true,
+  });
 }
 
 export async function clearMessages() {

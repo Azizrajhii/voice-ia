@@ -152,7 +152,9 @@ function HistoryPage() {
                       <span className="rounded-full bg-secondary px-2.5 py-1 font-medium text-secondary-foreground">
                         {LANGUAGE_LABEL[message.language]}
                       </span>
-                      <time dateTime={message.created_at}>{format(new Date(message.created_at), "p")}</time>
+                      <time dateTime={message.created_at}>
+                        {format(new Date(message.created_at), "p")}
+                      </time>
                     </div>
                     <p className="surface-warm w-fit max-w-full rounded-2xl rounded-br-md px-4 py-2.5 text-sm leading-relaxed text-coral-foreground">
                       {message.transcript}

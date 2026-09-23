@@ -1,6 +1,12 @@
-import { listAllUsers, countAllUsers, updateUserRole, deleteUserById, findUserById } from '../models/User.js';
-import { countAllMessages, countMessagesToday } from '../models/Message.js';
-import { validateRole, assertNotSelf } from '../lib/admin.js';
+import {
+  listAllUsers,
+  countAllUsers,
+  updateUserRole,
+  deleteUserById,
+  findUserById,
+} from "../models/User.js";
+import { countAllMessages, countMessagesToday } from "../models/Message.js";
+import { validateRole, assertNotSelf } from "../lib/admin.js";
 
 export async function getOverview(req, res) {
   const [userCount, messageCount, messagesToday] = await Promise.all([
@@ -26,7 +32,7 @@ export async function setRole(req, res) {
   if (roleError) return res.status(400).json({ message: roleError });
 
   const target = await findUserById(targetId);
-  if (!target) return res.status(404).json({ message: 'User not found' });
+  if (!target) return res.status(404).json({ message: "User not found" });
 
   const updated = await updateUserRole(targetId, role);
   return res.json({ user: updated });
@@ -39,7 +45,7 @@ export async function removeUser(req, res) {
   if (selfError) return res.status(400).json({ message: selfError });
 
   const target = await findUserById(targetId);
-  if (!target) return res.status(404).json({ message: 'User not found' });
+  if (!target) return res.status(404).json({ message: "User not found" });
 
   await deleteUserById(targetId);
   return res.json({ success: true });

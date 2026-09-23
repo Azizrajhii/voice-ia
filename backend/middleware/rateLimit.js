@@ -1,4 +1,4 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit from "express-rate-limit";
 
 // Brute-force / spam-signup guard: a handful of attempts per IP every 15 minutes.
 export const authLimiter = rateLimit({
@@ -6,7 +6,7 @@ export const authLimiter = rateLimit({
   limit: 10,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { message: 'Too many attempts. Please try again in a few minutes.' },
+  message: { message: "Too many attempts. Please try again in a few minutes." },
 });
 
 // Protects the Gemini free-tier quota and the server from being hammered by one client.
@@ -15,5 +15,5 @@ export const chatLimiter = rateLimit({
   limit: 20,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { message: 'Too many messages. Please slow down a little.' },
+  message: { message: "Too many messages. Please slow down a little." },
 });

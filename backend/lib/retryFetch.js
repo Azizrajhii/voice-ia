@@ -8,7 +8,10 @@ function sleep(ms) {
  * statuses (e.g. 429 quota errors, where waiting a few hundred ms won't help)
  * are returned immediately on the first attempt.
  */
-export async function retryFetch(fetchFn, { maxRetries = 2, baseDelayMs = 400, retryOnStatus = () => false } = {}) {
+export async function retryFetch(
+  fetchFn,
+  { maxRetries = 2, baseDelayMs = 400, retryOnStatus = () => false } = {},
+) {
   for (let attempt = 0; ; attempt += 1) {
     let response;
     try {

@@ -168,8 +168,8 @@ function SettingsPage() {
               <AlertDialogHeader>
                 <AlertDialogTitle>Delete your account?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This permanently deletes your account and every saved conversation. This can't
-                  be undone.
+                  This permanently deletes your account and every saved conversation. This can't be
+                  undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

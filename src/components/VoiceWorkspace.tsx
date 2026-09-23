@@ -68,8 +68,7 @@ export function VoiceWorkspace() {
   function startListening() {
     const w = window as unknown as Record<string, unknown>;
     const Ctor = (w["SpeechRecognition"] ?? w["webkitSpeechRecognition"]) as
-      | (new () => SpeechRecognitionLike)
-      | undefined;
+      (new () => SpeechRecognitionLike) | undefined;
     if (!Ctor) {
       toast.error("Your browser can't listen yet. Try Chrome, or type your message.");
       return;
@@ -115,7 +114,9 @@ export function VoiceWorkspace() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="font-display text-2xl font-semibold">Voice workspace</h2>
-          <p className="text-sm text-muted-foreground">Talk naturally — Souty follows your language.</p>
+          <p className="text-sm text-muted-foreground">
+            Talk naturally — Souty follows your language.
+          </p>
         </div>
         <div className="flex items-center gap-2 rounded-full bg-secondary p-1">
           {LANGUAGES.map((l) => (
@@ -246,12 +247,7 @@ export function VoiceWorkspace() {
       </div>
 
       {turns.length > 0 && (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="mt-6"
-          onClick={() => setTurns([])}
-        >
+        <Button variant="ghost" size="sm" className="mt-6" onClick={() => setTurns([])}>
           <Trash2 className="size-4" />
           Clear conversation
         </Button>

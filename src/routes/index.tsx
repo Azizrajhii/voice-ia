@@ -15,7 +15,8 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Souty — Tunisian AI Voice Assistant" },
       {
         property: "og:description",
-        content: "Speak Derja, French or English. Souty listens, understands and answers instantly.",
+        content:
+          "Speak Derja, French or English. Souty listens, understands and answers instantly.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

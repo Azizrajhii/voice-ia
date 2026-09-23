@@ -1,4 +1,8 @@
-import { countMessagesByUser, listMessagesByUser, deleteMessagesByUser } from '../models/Message.js';
+import {
+  countMessagesByUser,
+  listMessagesByUser,
+  deleteMessagesByUser,
+} from "../models/Message.js";
 
 export async function getStats(req, res) {
   const count = await countMessagesByUser(req.userId);

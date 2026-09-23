@@ -1,7 +1,7 @@
-export const ROLES = new Set(['user', 'admin']);
+export const ROLES = new Set(["user", "admin"]);
 
 export function validateRole(role) {
-  if (typeof role !== 'string' || !ROLES.has(role)) {
+  if (typeof role !== "string" || !ROLES.has(role)) {
     return { error: 'role must be "user" or "admin"' };
   }
   return { value: role };

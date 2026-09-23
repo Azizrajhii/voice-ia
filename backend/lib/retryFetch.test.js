@@ -1,8 +1,8 @@
-import { test } from 'node:test';
-import assert from 'node:assert/strict';
-import { retryFetch } from './retryFetch.js';
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { retryFetch } from "./retryFetch.js";
 
-test('succeeds immediately when the first response is not retryable', async () => {
+test("succeeds immediately when the first response is not retryable", async () => {
   let calls = 0;
   const response = await retryFetch(
     async () => {
@@ -15,7 +15,7 @@ test('succeeds immediately when the first response is not retryable', async () =
   assert.equal(response.status, 200);
 });
 
-test('retries on a matching status and succeeds once it recovers', async () => {
+test("retries on a matching status and succeeds once it recovers", async () => {
   let calls = 0;
   const response = await retryFetch(
     async () => {
@@ -28,7 +28,7 @@ test('retries on a matching status and succeeds once it recovers', async () => {
   assert.equal(response.status, 200);
 });
 
-test('gives up after maxRetries and returns the last failing response', async () => {
+test("gives up after maxRetries and returns the last failing response", async () => {
   let calls = 0;
   const response = await retryFetch(
     async () => {
@@ -41,7 +41,7 @@ test('gives up after maxRetries and returns the last failing response', async ()
   assert.equal(response.status, 503);
 });
 
-test('does not retry a status retryOnStatus rejects', async () => {
+test("does not retry a status retryOnStatus rejects", async () => {
   let calls = 0;
   const response = await retryFetch(
     async () => {
@@ -54,14 +54,14 @@ test('does not retry a status retryOnStatus rejects', async () => {
   assert.equal(response.status, 429);
 });
 
-test('retries a thrown network error, then rethrows once exhausted', async () => {
+test("retries a thrown network error, then rethrows once exhausted", async () => {
   let calls = 0;
   await assert.rejects(
     () =>
       retryFetch(
         async () => {
           calls += 1;
-          throw new Error('network down');
+          throw new Error("network down");
         },
         { baseDelayMs: 1, maxRetries: 2 },
       ),
